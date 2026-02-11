@@ -1,197 +1,381 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import ImageZoomModal from './ImageZoomModal';
 
-const RISK_FACTORS = [
+const SCENARIOS = [
     {
-        icon: '🌧️', title: 'Rainfall Intensity', level: 'High', levelColor: '#ffb74d',
-        description: 'Increasing monsoon intensity and erratic rainfall projected to amplify hydraulic erosion forces.',
-        trend: '+18% projected by 2040', barWidth: 78,
-        barColor: 'linear-gradient(90deg, #ffb74d, #ef5350)',
+        title: 'SSP1- 2.6',
+        color: '#00c853', // Green
+        bg: 'rgba(0, 200, 83, 0.1)',
+        border: 'rgba(0, 200, 83, 0.3)',
+        details: [
+            'Strong Mitigation adopted',
+            'Low emissions',
+            'Warming by ~2° C by 2100',
+            'Positive or Low Impacts'
+        ]
     },
     {
-        icon: '🏗️', title: 'Land Use Pressure', level: 'Very High', levelColor: '#ef5350',
-        description: 'Built-up expansion (542% in 30 years) destabilizes riparian zones and increases runoff.',
-        trend: '929 km² and growing', barWidth: 92,
-        barColor: 'linear-gradient(90deg, #ef5350, #c62828)',
+        title: 'SSP2- 4.5',
+        color: '#d84315', // Brownish/Orange? Wireframe looks brown/bronze. Let's try a brown-orange.
+        bg: 'rgba(216, 67, 21, 0.1)',
+        border: 'rgba(216, 67, 21, 0.3)',
+        details: [
+            'Middle Pathway',
+            'Moderate emissions',
+            'Warming by ~2.8° C by 2100',
+            'Business -as- usual Outcome'
+        ]
     },
     {
-        icon: '⛰️', title: 'Slope Vulnerability', level: 'Moderate', levelColor: '#26c6da',
-        description: 'Bank slope gradients with sandy soil create zones of heightened lateral erosion vulnerability.',
-        trend: 'Sandy soil reduced 65%', barWidth: 55,
-        barColor: 'linear-gradient(90deg, #26c6da, #0288d1)',
-    },
-    {
-        icon: '🌊', title: 'Discharge Variability', level: 'High', levelColor: '#ffb74d',
-        description: 'Seasonal discharge peaks increase frequency and magnitude of erosive events.',
-        trend: 'Peak discharge +12%', barWidth: 72,
-        barColor: 'linear-gradient(90deg, #ffb74d, #ff7043)',
-    },
+        title: 'SSP5- 8.5',
+        color: '#c62828', // Red
+        bg: 'rgba(198, 40, 40, 0.1)',
+        border: 'rgba(198, 40, 40, 0.3)',
+        details: [
+            'Poor Mitigation',
+            'High emissions',
+            'Warming by ~4.4° C by 2100',
+            'Negative and Extreme Impacts'
+        ]
+    }
 ];
 
-export default function PredictedErosionRisk({ onBack }) {
-    const [animateGauge, setAnimateGauge] = useState(false);
+const YEARS = [2030, 2035, 2040, 2045, 2050];
 
-    useEffect(() => {
-        const timer = setTimeout(() => setAnimateGauge(true), 300);
-        return () => clearTimeout(timer);
-    }, []);
+export default function PredictedErosionRisk() {
+    const [selectedYear, setSelectedYear] = useState('');
+    const [zoomedImage, setZoomedImage] = useState(null);
 
-    const riskScore = 7.2;
-    const maxScore = 10;
-    const gaugePercentage = riskScore / maxScore;
-    const circumference = Math.PI * 100;
-    const dashOffset = circumference * (1 - gaugePercentage);
+    const handleYearChange = (e) => {
+        setSelectedYear(parseInt(e.target.value));
+    };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', gap: 0 }}>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            overflowY: 'auto', // Allow scrolling if content overflows
+            overflowX: 'hidden',
+            padding: '20px',
+            gap: '24px',
+            color: 'var(--text-primary)',
+            fontFamily: 'var(--font-heading)'
+        }}>
+            {/* Zoom Modal */}
+            {zoomedImage && (
+                <ImageZoomModal
+                    src={zoomedImage}
+                    onClose={() => setZoomedImage(null)}
+                />
+            )}
 
-            {/* Section Header */}
-            <div className="section-header animate-in">
-                <h2>⚠️ Predicted Erosion Risk</h2>
+            {/* Header Section */}
+            <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                <h2 style={{
+                    background: 'linear-gradient(90deg, #0d47a1, #1565c0)', // Dark Blue bg as per wireframe text background
+                    display: 'inline-block',
+                    padding: '10px 30px',
+                    borderRadius: '4px',
+                    fontSize: '1.4rem',
+                    color: '#fff',
+                    marginBottom: '15px',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                }}>
+                    Predicted Erosion Risk for Different Climate Scenarios
+                </h2>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <h3 style={{
+                        background: '#0d47a1', // Darker blue
+                        padding: '8px 40px',
+                        borderRadius: '4px',
+                        fontSize: '1.1rem',
+                        color: '#fff',
+                        fontWeight: 500
+                    }}>
+                        CMIP 6 Model Scenarios
+                    </h3>
+                </div>
             </div>
 
-            {/* Main Content */}
-            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 12 }}>
+            {/* Year Selection */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+                <div className="glass-card" style={{ padding: '15px 25px', display: 'flex', flexDirection: 'column', width: '300px' }}>
+                    <label style={{
+                        fontSize: '1rem',
+                        fontWeight: 'bold',
+                        marginBottom: '8px',
+                        color: '#fff',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.8)'
+                    }}>Select the Year</label>
+                    <select
+                        value={selectedYear}
+                        onChange={handleYearChange}
+                        style={{
+                            padding: '10px',
+                            background: '#fff',
+                            color: '#000',
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontSize: '1rem',
+                            cursor: 'pointer',
+                            outline: 'none'
+                        }}
+                    >
+                        <option value="" disabled>Select a year</option>
+                        {YEARS.map(year => (
+                            <option key={year} value={year} disabled={year !== 2050}>
+                                {year}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
 
-                {/* Top Row — Gauge + Summary + Stats */}
-                <div className="animate-in animate-in-delay-1 responsive-grid-3-uneven" style={{ display: 'grid', gridTemplateColumns: '260px 1fr 280px', gap: 12, flexShrink: 0 }}>
-
-                    {/* Gauge */}
-                    <div className="glass-card" style={{ padding: '16px 20px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <h3 style={{
-                            fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em',
-                            color: 'var(--accent-teal)', fontFamily: 'var(--font-heading)', marginBottom: 10,
-                        }}>Overall Risk</h3>
-
-                        <svg width="200" height="115" viewBox="0 0 220 120">
-                            <path d="M 10 110 A 100 100 0 0 1 210 110" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="14" strokeLinecap="round" />
-                            <path
-                                d="M 10 110 A 100 100 0 0 1 210 110"
-                                fill="none" stroke="url(#gaugeGrad)" strokeWidth="14" strokeLinecap="round"
-                                strokeDasharray={`${circumference}`}
-                                strokeDashoffset={animateGauge ? dashOffset : circumference}
-                                style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1)' }}
-                            />
-                            <defs>
-                                <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
-                                    <stop offset="0%" stopColor="#66bb6a" />
-                                    <stop offset="40%" stopColor="#ffb74d" />
-                                    <stop offset="70%" stopColor="#ef5350" />
-                                    <stop offset="100%" stopColor="#c62828" />
-                                </linearGradient>
-                            </defs>
-                            <text x="110" y="95" textAnchor="middle" fill="var(--text-primary)" fontSize="36" fontWeight="800" fontFamily="var(--font-heading)">
-                                {riskScore}
-                            </text>
-                            <text x="110" y="112" textAnchor="middle" fill="var(--text-muted)" fontSize="10" fontFamily="var(--font-mono)">
-                                / {maxScore}
-                            </text>
-                        </svg>
-
+            {/* Scenarios Row */}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '20px',
+                marginBottom: '20px'
+            }}>
+                {SCENARIOS.map((scenario) => (
+                    <div key={scenario.title} style={{
+                        border: `1px solid ${scenario.border}`, // Fallback border
+                        borderRadius: '0', // Wireframe has rectangular headers
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        boxShadow: '0 0 15px rgba(0,0,0,0.2)'
+                    }}>
+                        {/* Title Bar */}
                         <div style={{
-                            marginTop: 6,
-                            background: 'rgba(239, 83, 80, 0.1)',
-                            border: '1px solid rgba(239, 83, 80, 0.2)',
-                            borderRadius: 'var(--radius-sm)',
-                            padding: '4px 16px',
-                            color: '#ef5350',
-                            fontSize: '0.72rem',
-                            fontWeight: 700,
-                            fontFamily: 'var(--font-heading)',
+                            background: '#0a192f', // Dark background for title
+                            padding: '12px',
+                            textAlign: 'center',
+                            borderBottom: `2px solid ${scenario.color}`
                         }}>
-                            🔴 HIGH RISK
+                            <h4 style={{
+                                color: '#fff',
+                                fontStyle: 'italic',
+                                fontWeight: 'bold',
+                                fontSize: '1.2rem',
+                                margin: 0
+                            }}>{scenario.title}</h4>
+                        </div>
+                        {/* Content */}
+                        <div style={{
+                            background: scenario.color, // Full colored background as per wireframe
+                            padding: '20px',
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            textAlign: 'center',
+                            gap: '8px'
+                        }}>
+                            {scenario.details.map((line, idx) => (
+                                <p key={idx} style={{
+                                    margin: 0,
+                                    fontSize: '0.95rem',
+                                    color: 'rgba(255,255,255,0.95)',
+                                    fontWeight: 500,
+                                    lineHeight: '1.4'
+                                }}>{line}</p>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Bottom Content - Only Visible for 2050 */}
+            {selectedYear === 2050 && (
+                <div className="animate-in" style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '20px'
+                }}>
+                    {/* Images Row */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '20px'
+                    }}>
+                        {/* Image 1 (PNG 8) */}
+                        <div
+                            onClick={() => setZoomedImage('images/PNG -8.jpg')}
+                            style={{
+                                cursor: 'pointer',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                background: '#fff', // White background placeholder like wireframe
+                                height: '300px', // Fixed height for consistency
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                position: 'relative'
+                            }}
+                        >
+                            <img
+                                src="images/PNG -8.jpg"
+                                alt="Analysis 1"
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'contain', // Keep aspect ratio
+                                    background: 'black'
+                                }}
+                            />
+                            <div style={{
+                                position: 'absolute',
+                                top: 10,
+                                left: 10,
+                                background: 'rgba(0,0,0,0.6)',
+                                padding: '2px 8px',
+                                fontSize: '0.8rem',
+                                color: '#fff'
+                            }}>PNG 8</div>
+                        </div>
+
+                        {/* Image 2 (PNG 9) */}
+                        <div
+                            onClick={() => setZoomedImage('images/PNG -9.jpg')}
+                            style={{
+                                cursor: 'pointer',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                background: '#fff',
+                                height: '300px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                position: 'relative'
+                            }}
+                        >
+                            <img
+                                src="images/PNG -9.jpg"
+                                alt="Analysis 2"
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'contain',
+                                    background: 'black'
+                                }}
+                            />
+                            <div style={{
+                                position: 'absolute',
+                                top: 10,
+                                left: 10,
+                                background: 'rgba(0,0,0,0.6)',
+                                padding: '2px 8px',
+                                fontSize: '0.8rem',
+                                color: '#fff'
+                            }}>PNG 9</div>
                         </div>
                     </div>
 
-                    {/* Summary */}
-                    <div className="glass-card animate-slide-right" style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <h3 style={{ fontSize: '0.85rem', fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', marginBottom: 10, fontWeight: 700 }}>
-                            Erosion Risk Forecast
-                        </h3>
-                        <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: 8 }}>
-                            The Ganga Main Stem near Patna shows <strong style={{ color: 'var(--accent-rose)' }}>elevated and increasing vulnerability</strong> driven by rapid urban expansion (542% built-up increase) that has significantly reduced natural riparian buffers.
-                        </p>
-                        <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', lineHeight: 1.65 }}>
-                            Erosion rates projected to increase <strong style={{ color: 'var(--accent-amber)' }}>22–35%</strong> by 2040, with highest vulnerability in upstream meander zones where cropland-to-urban conversion is most aggressive.
-                        </p>
-                    </div>
-
-                    {/* Key Stats */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        {[
-                            { label: 'Annual Land Loss', value: '~12.4', unit: 'km²/yr', color: '#ef5350' },
-                            { label: 'Peak Risk Zone', value: 'Upstream', unit: 'meanders', color: '#ffb74d' },
-                            { label: 'Vulnerable Pop.', value: '~2.1M', unit: 'people', color: '#ab47bc' },
-                        ].map((stat) => (
-                            <div key={stat.label} className="glass-card animate-slide-right" style={{ padding: '10px 14px', textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>
-                                    {stat.label}
-                                </div>
-                                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: stat.color, fontFamily: 'var(--font-heading)' }}>
-                                    {stat.value}
-                                </div>
-                                <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                                    {stat.unit}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Bottom — Risk Factors Grid */}
-                <div className="animate-in animate-in-delay-2" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                    {/* Instruction Text */}
                     <div style={{
-                        padding: '8px 18px',
-                        background: 'rgba(0,0,0,0.1)',
-                        borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
-                        borderBottom: '1px solid var(--border-subtle)',
-                        flexShrink: 0,
+                        background: '#fff',
+                        color: '#000',
+                        padding: '10px 20px',
+                        display: 'inline-block',
+                        fontSize: '1rem',
+                        fontWeight: 500,
+                        alignSelf: 'flex-start',
+                        maxWidth: '400px'
                     }}>
-                        <h3 style={{
-                            fontSize: '0.68rem', fontFamily: 'var(--font-heading)', color: 'var(--accent-amber)',
-                            textTransform: 'uppercase', letterSpacing: '0.06em',
-                        }}>Contributing Risk Factors</h3>
+                        Click on the images for high resolution analysis
                     </div>
-                    <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', flex: 1, minHeight: 0 }}>
-                        {RISK_FACTORS.map((factor, i) => (
-                            <div
-                                key={factor.title}
-                                className="glass-card"
-                                style={{
-                                    padding: '14px 16px',
-                                    borderRadius: 0,
-                                    borderRight: i % 2 === 0 ? '1px solid var(--border-subtle)' : 'none',
-                                    borderBottom: i < 2 ? '1px solid var(--border-subtle)' : 'none',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                                    <span style={{ fontSize: '1.2rem' }}>{factor.icon}</span>
-                                    <div>
-                                        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)' }}>{factor.title}</div>
-                                        <span style={{ fontSize: '0.62rem', fontWeight: 700, color: factor.levelColor, textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>{factor.level}</span>
-                                    </div>
-                                </div>
-                                <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: 1.55, marginBottom: 8 }}>
-                                    {factor.description}
-                                </p>
-                                <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 'var(--radius-sm)', height: 4, overflow: 'hidden', marginBottom: 4 }}>
-                                    <div style={{ width: `${factor.barWidth}%`, height: '100%', background: factor.barColor, borderRadius: 'var(--radius-sm)', transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
-                                </div>
-                                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{factor.trend}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
 
-                {/* Disclaimer */}
-                <div className="glass-card animate-in animate-in-delay-3" style={{ padding: '8px 16px', textAlign: 'center', flexShrink: 0 }}>
-                    <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                        <strong style={{ color: 'var(--accent-amber)' }}>⚠️</strong> Predictions based on RUSLE outputs, CMIP6 climate projections, and land-use extrapolation. Actual rates may vary.
-                    </p>
+                    {/* Videos Row (Using same video for both slots or just one as per availability)
+                         User said: "current i have only one video use that video only no problem"
+                         Wireframe has "Video 1" and "Video 2". I will put the video in one and maybe a placeholder in other?
+                         Actually, the wireframe shows two video boxes at bottom. I will duplicate the video for now to match layout or make it just one.
+                         Wireframe shows Video 1 (left) and Video 2 (right).
+                         I will assume I should just show the one video I have. I'll center it or show it in the grid.
+                         Let's stick to the wireframe layout and put the SAME video in both slots or just use one big slot?
+                         The user said "play the video infinitely" (singular).
+                         I'll put it in a grid but maybe just one centered if I only have one?
+                         Wireframe clearly has 2 distinct boxes. I'll put the video in the first box and maybe a "No Data" or similar in 2nd, or just duplicate it so it looks complete.
+                         Let's duplicate it for now as "Simulation 1" and "Simulation 2" to fill the space, or leave the second blank.
+                         Better: I will use the one video in the left slot, and maybe an image placeholder or empty in the right slot to roughly match the wireframe "Video 2" box without breaking anything.
+                     */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '20px',
+                        alignItems: 'end' // Align to bottom
+                    }}>
+                        {/* Video 1 */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                            <div style={{
+                                background: '#fff',
+                                padding: '5px 10px',
+                                color: '#000',
+                                fontSize: '0.8rem',
+                                width: 'fit-content'
+                            }}>Video 1</div>
+                            <video
+                                src="videos/Vid2_velocity.mp4"
+                                autoPlay
+                                loop
+                                muted
+                                style={{
+                                    width: '100%',
+                                    height: 'auto',
+                                    border: '1px solid rgba(255,255,255,0.2)'
+                                }}
+                            />
+                        </div>
+
+                        {/* Video 2 Mockup - using same video or empty?
+                            Let's just leave it empty with a label to match wireframe style, or maybe use PNG 7 or something?
+                            Actually, let's just duplicate the video to make it look "full" if that's what the user wants for "design it well",
+                            or just Center the one video?
+                            Wireframe has 2 boxes. I'll put the video in the first one.
+                            I'll leave the second one as a placeholder.
+                        */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                            <div style={{
+                                background: '#fff',
+                                padding: '5px 10px',
+                                color: '#000',
+                                fontSize: '0.8rem',
+                                width: 'fit-content'
+                            }}>Video 2</div>
+                            <div style={{
+                                width: '100%',
+                                height: '200px', // Approximate height
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                background: 'rgba(0,0,0,0.5)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#aaa'
+                            }}>
+                                [No Video 2 Available]
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {/* Footer Label */}
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <div style={{
+                            background: '#fff',
+                            color: '#000',
+                            padding: '8px 20px',
+                            fontSize: '0.9rem',
+                            fontWeight: 'bold'
+                        }}>
+                            HEC- RAS 2D Unsteady Flow Simulation
+                        </div>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
+
