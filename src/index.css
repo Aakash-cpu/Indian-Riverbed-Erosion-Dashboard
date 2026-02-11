@@ -575,16 +575,18 @@ h4 {
 
 /* ── Legend ── */
 .legend-card {
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 12px 16px;
-  color: #1a1a2e;
+  color: var(--text-primary);
 }
 
 .legend-card h4 {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--accent-sky);
   margin-bottom: 6px;
 }
 
@@ -594,7 +596,7 @@ h4 {
   gap: 8px;
   padding: 2px 0;
   font-size: 0.72rem;
-  color: #333;
+  color: var(--text-secondary);
 }
 
 .legend-color {
