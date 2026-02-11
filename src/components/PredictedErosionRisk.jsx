@@ -308,7 +308,7 @@ export default function PredictedErosionRisk() {
                         gap: '20px',
                         alignItems: 'end' // Align to bottom
                     }}>
-                        {/* Video 1 */}
+                        {/* Video 1 - Flow Velocity */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                             <div style={{
                                 background: '#fff',
@@ -316,12 +316,13 @@ export default function PredictedErosionRisk() {
                                 color: '#000',
                                 fontSize: '0.8rem',
                                 width: 'fit-content'
-                            }}>Video 1</div>
+                            }}>Flow Velocity</div>
                             <video
                                 src="videos/Vid2_velocity.mp4"
                                 autoPlay
                                 loop
                                 muted
+                                playsInline
                                 style={{
                                     width: '100%',
                                     height: 'auto',
@@ -330,13 +331,7 @@ export default function PredictedErosionRisk() {
                             />
                         </div>
 
-                        {/* Video 2 Mockup - using same video or empty?
-                            Let's just leave it empty with a label to match wireframe style, or maybe use PNG 7 or something?
-                            Actually, let's just duplicate the video to make it look "full" if that's what the user wants for "design it well",
-                            or just Center the one video?
-                            Wireframe has 2 boxes. I'll put the video in the first one.
-                            I'll leave the second one as a placeholder.
-                        */}
+                        {/* Video 2 - Flood Inundation */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                             <div style={{
                                 background: '#fff',
@@ -344,19 +339,19 @@ export default function PredictedErosionRisk() {
                                 color: '#000',
                                 fontSize: '0.8rem',
                                 width: 'fit-content'
-                            }}>Video 2</div>
-                            <div style={{
-                                width: '100%',
-                                height: '200px', // Approximate height
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                background: 'rgba(0,0,0,0.5)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: '#aaa'
-                            }}>
-                                [No Video 2 Available]
-                            </div>
+                            }}>Flood Inundation</div>
+                            <video
+                                src="videos/Vid1_Depth.mp4"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                style={{
+                                    width: '100%',
+                                    height: 'auto',
+                                    border: '1px solid rgba(255,255,255,0.2)'
+                                }}
+                            />
                         </div>
 
                     </div>
