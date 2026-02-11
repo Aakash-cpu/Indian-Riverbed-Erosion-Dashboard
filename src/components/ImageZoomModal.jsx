@@ -135,7 +135,7 @@ export default function ImageZoomModal({ src, onClose }) {
                     maxWidth: '88vw',
                     maxHeight: '85vh',
                     borderRadius: '6px',
-                    background: '#ffffff',
+                    background: 'transparent',
                     boxShadow: '0 16px 60px rgba(0,0,0,0.6)',
                     transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
                     transition: isDragging ? 'none' : 'transform 0.15s ease-out',

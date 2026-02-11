@@ -22,7 +22,7 @@ export default function App() {
             <header className="dashboard-header">
                 <div className="dashboard-header-inner">
                     <div>
-                        <h1 className="dashboard-title">🌊 Indian Riverbed Erosion Dashboard</h1>
+                        <h1 className="dashboard-title">🌊 Indian Riverbank Erosion Dashboard</h1>
                         <p className="dashboard-subtitle">LiDAR DEMs · Satellite Analysis · Risk Prediction</p>
                     </div>
                     {currentView !== 'main' && (
